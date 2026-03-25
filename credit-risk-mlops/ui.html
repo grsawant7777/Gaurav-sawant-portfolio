@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CreditGuard | AI Risk Engine</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1e40af',
+            success: '#10b981',
+            danger: '#ef4444',
+            warning: '#f59e0b',
+            background: '#f8fafc',
+            
+            // Custom risk colors for the card
+            risk_low: '#10b981',
+            risk_mod: '#f59e0b',
+            risk_high: '#ef4444',
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'fade-in': 'fadeIn 0.6s ease-out',
+            'spin-slow': 'spin 3s linear infinite',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-background text-gray-800 dark:bg-gray-900 dark:text-gray-100 p-4">
+
+  <header class="text-center py-8">
+    <h1 class="text-4xl font-extrabold text-primary flex items-center justify-center">
+        <i class="fas fa-shield-alt mr-3"></i>Predictive Credit Risk Engine
+    </h1>
+    <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Robust MLOps Deployment using FastAPI & Scikit-Learn</p>
+  </header>
+
+  <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <section class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-primary/50">
+        <h2 class="text-2xl font-semibold mb-4 border-b pb-2 flex justify-between items-center">
+            Single Prediction
+            <span id="single-loading" class="text-primary hidden">
+                <i class="fas fa-spinner animate-spin"></i> Analyzing...
+            </span>
+        </h2>
+        
+        <form id="singleForm" onsubmit="event.preventDefault(); predictSingle();">
+            <div class="space-y-4">
+                <div class="flex flex-col">
+                    <label for="person_age" class="text-sm font-medium mb-1">Age</label>
+                    <input type="number" id="person_age" value="25" min="18" required class="p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <div class="flex flex-col">
+                    <label for="person_income" class="text-sm font-medium mb-1">Annual Income ($)</label>
+                    <input type="number" id="person_income" value="65000" min="0" required class="p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <div class="flex flex-col">
+                    <label for="loan_amnt" class="text-sm font-medium mb-1">Loan Amount ($)</label>
+                    <input type="number" id="loan_amnt" value="15000" min="100" required class="p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <div class="flex flex-col">
+                    <label for="person_home_ownership" class="text-sm font-medium mb-1">Home Ownership</label>
+                    <select id="person_home_ownership" required class="p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600">
+                        <option value="RENT">RENT</option>
+                        <option value="OWN">OWN</option>
+                        <option value="MORTGAGE">MORTGAGE</option>
+                        <option value="OTHER">OTHER</option>
+                    </select>
+                </div>
+                <div class="flex flex-col">
+                    <label for="loan_intent" class="text-sm font-medium mb-1">Loan Intent</label>
+                    <select id="loan_intent" required class="p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600">
+                        <option value="PERSONAL">PERSONAL</option>
+                        <option value="EDUCATION">EDUCATION</option>
+                        <option value="MEDICAL">MEDICAL</option>
+                        <option value="VENTURE">VENTURE</option>
+                        <option value="HOMEIMPROVEMENT">HOME IMPROVEMENT</option>
+                        <option value="DEBTCONSOLIDATION">DEBT CONSOLIDATION</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" id="singlePredictBtn" class="mt-6 w-full bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded transition duration-200 disabled:opacity-50">
+                <i class="fas fa-magic mr-2"></i> Get Risk Prediction
+            </button>
+        </form>
+
+        <div id="singleResult" class="hidden mt-6 animate-fade-in">
+            </div>
+
+        <div id="singleError" class="hidden mt-4 p-3 bg-danger/10 text-danger border border-danger rounded-lg font-medium"></div>
+    </section>
+    
+    <section class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-primary/50">
+        <h2 class="text-2xl font-semibold mb-4 border-b pb-2 flex justify-between items-center">
+            Batch Prediction (JSON Input)
+            <span id="batch-loading" class="text-primary hidden">
+                <i class="fas fa-spinner animate-spin"></i> Processing...
+            </span>
+        </h2>
+        
+        <textarea id="batchInput" class="w-full h-64 p-3 border border-gray-300 rounded-lg bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 text-sm focus:ring-primary focus:border-primary" placeholder='Paste JSON payload here: {"applications": [...]}'></textarea>
+        
+        <button id="batchPredictBtn" onclick="predictBatch()" class="mt-4 w-full bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded transition duration-200 disabled:opacity-50">
+            <i class="fas fa-paper-plane mr-2"></i> Run Batch Prediction
+        </button>
+
+        <div id="batchResult" class="hidden mt-6 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600">
+            <h3 class="font-semibold text-xl mb-3 border-b pb-1 text-gray-800 dark:text-gray-200">Prediction Summary</h3>
+            <div id="batchSummary" class="mb-4"></div>
+            <details>
+                <summary class="cursor-pointer font-medium text-primary hover:text-primary/80">View Full JSON Output</summary>
+                <pre class="overflow-x-auto whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 mt-2"></pre>
+            </details>
+        </div>
+        <div id="batchError" class="hidden mt-4 p-3 bg-danger/10 text-danger border border-danger rounded-lg font-medium"></div>
+    </section>
+
+    <section class="lg:col-span-3 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-t-4 border-primary/50">
+        <h2 class="text-2xl font-semibold mb-4 border-b pb-2 flex justify-between items-center">
+            CSV File Upload
+            <span id="csv-loading" class="text-primary hidden">
+                <i class="fas fa-spinner animate-spin"></i> Uploading...
+            </span>
+        </h2>
+        
+        <div id="dropZone" 
+             class="border-2 border-dashed border-gray-400 dark:border-gray-600 rounded-lg p-8 text-center cursor-pointer hover:border-primary transition duration-150"
+             ondragover="dragOverHandler(event)"
+             ondragleave="event.currentTarget.classList.remove('border-primary')"
+             ondrop="dropHandler(event)"
+             onclick="document.getElementById('csvFile').click()">
+            <i class="fas fa-file-csv text-4xl text-gray-400 mb-2"></i>
+            <p class="text-gray-500 dark:text-gray-400">Drag & drop a CSV file here, or click to select.</p>
+        </div>
+        <input type="file" id="csvFile" class="hidden" accept=".csv" onchange="csvSelected(event)">
+        
+        <button id="csvPredictBtn" onclick="predictCSV()" class="mt-4 w-full bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded transition duration-200 disabled:opacity-50" disabled>
+            <i class="fas fa-robot mr-2"></i> Process CSV and Download Report
+        </button>
+
+        <div id="csvResult" class="hidden mt-6 p-4 bg-success/10 text-success border border-success rounded-lg font-medium text-center">
+            <p class="font-bold mb-2">✅ CSV processed successfully! Download your full report with predictions.</p>
+            <button onclick="downloadCSV()" class="bg-success hover:bg-success/90 text-white font-bold py-2 px-4 rounded transition duration-200">
+                <i class="fas fa-download mr-2"></i> Download credit_risk_report.csv
+            </button>
+        </div>
+        <div id="csvError" class="hidden mt-4 p-3 bg-danger/10 text-danger border border-danger rounded-lg font-medium"></div>
+    </section>
+
+  </main>
+
+<script>
+    let csvBlob = null;
+    let currentCSV = null;
+
+    // Helper to map risk categories to Tailwind classes for interpretability (used for batch summary rows)
+    function getRiskColor(category) {
+        if (category === 'HIGH_RISK') return 'text-danger bg-danger/10 border-danger';
+        if (category === 'MODERATE_RISK') return 'text-warning bg-warning/10 border-warning';
+        return 'text-success bg-success/10 border-success';
+    }
+
+    // Helper to map risk categories to Tailwind colors for the single risk card
+    function getRiskCardClasses(category) {
+        if (category === 'HIGH_RISK') return { icon: 'fas fa-exclamation-triangle', color: 'bg-risk_high', text: 'text-risk_high' };
+        if (category === 'MODERATE_RISK') return { icon: 'fas fa-bell', color: 'bg-risk_mod', text: 'text-risk_mod' };
+        return { icon: 'fas fa-check-circle', color: 'bg-risk_low', text: 'text-risk_low' };
+    }
+    
+    // Helper to generate the visually appealing risk card HTML
+    function getRiskCardHtml(proba, category) {
+        const { icon, color, text } = getRiskCardClasses(category);
+        const probaDisplay = proba.toFixed(2) + '%';
+        
+        return `
+            <div class="p-6 rounded-xl shadow-2xl border-2 border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-center space-x-4 mb-4 pb-4 border-b dark:border-gray-600">
+                    <i class="${icon} text-3xl ${text}"></i>
+                    <h3 class="text-2xl font-bold ${text}">${category.replace('_', ' ')}</h3>
+                </div>
+                
+                <div class="text-center my-6">
+                    <p class="text-xl text-gray-600 dark:text-gray-400">Probability of Default</p>
+                    <p class="text-6xl font-extrabold my-2 ${text}">${probaDisplay}</p>
+                </div>
+                
+                <div class="mt-6">
+                    <div class="w-full h-2 rounded-full ${color} transition-all duration-1000"></div>
+                    <div class="flex justify-between text-xs mt-1 text-gray-500 dark:text-gray-400">
+                        <span>Low (<20%)</span>
+                        <span>Moderate (<40%)</span>
+                        <span>High (≥40%)</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Helper to show errors clearly (Reliability)
+    function showSectionError(sectionId, message) {
+        const errorEl = document.getElementById(sectionId + 'Error');
+        errorEl.textContent = `Error: ${message}`;
+        errorEl.classList.remove('hidden');
+        if (sectionId === 'single') {
+            document.getElementById('singleResult').classList.add('hidden');
+        } else {
+            document.getElementById(sectionId + 'Result').classList.add('hidden');
+        }
+    }
+
+
+    // --- SINGLE PREDICTION LOGIC ---
+
+    async function predictSingle() {
+        const btn = document.getElementById('singlePredictBtn');
+        const loading = document.getElementById('single-loading');
+        const errorEl = document.getElementById('singleError');
+        const resultEl = document.getElementById('singleResult');
+
+        btn.disabled = true;
+        loading.classList.remove('hidden');
+        errorEl.classList.add('hidden');
+        resultEl.classList.add('hidden');
+
+        try {
+            // Read user inputs from the simplified form
+            const person_age = parseInt(document.getElementById('person_age').value);
+            const person_income = parseInt(document.getElementById('person_income').value);
+            const loan_amnt = parseInt(document.getElementById('loan_amnt').value);
+            const person_home_ownership = document.getElementById('person_home_ownership').value;
+            const loan_intent = document.getElementById('loan_intent').value;
+
+            if (isNaN(person_age) || isNaN(person_income) || isNaN(loan_amnt)) {
+                throw new Error("Please enter valid numbers for Age, Income, and Loan Amount.");
+            }
+
+            // Construct the full payload, hardcoding other required fields
+            const payload = {
+                person_age,
+                person_income,
+                person_home_ownership,
+                person_emp_length: 5.0, // Hardcoded
+                loan_intent,
+                loan_grade: "B", // Hardcoded
+                loan_amnt,
+                loan_int_rate: 10.0, // Hardcoded
+                // Calculate loan_percent_income based on user input for a more realistic test
+                loan_percent_income: (loan_amnt / person_income), 
+                cb_person_default_on_file: "N", // Hardcoded
+                cb_person_cred_hist_length: 5 // Hardcoded
+            };
+            
+            // Basic validation check for calculated field
+            if (payload.loan_percent_income <= 0.0 || payload.loan_percent_income > 1.0) {
+                 throw new Error("Loan Amount cannot be zero or greater than Income. Please adjust inputs.");
+            }
+
+            const res = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const errorJson = await res.json();
+                throw new Error(errorJson.detail || res.statusText);
+            }
+
+            const json = await res.json();
+            
+            // Render the visual risk card
+            resultEl.innerHTML = getRiskCardHtml(json.probability_of_default, json.risk_category);
+            resultEl.classList.remove('hidden');
+            
+        } catch (err) {
+            showSectionError('single', err.message);
+        } finally {
+            btn.disabled = false;
+            loading.classList.add('hidden');
+        }
+    }
+
+    // --- BATCH PREDICTION LOGIC (Remains the same) ---
+
+    async function predictBatch() {
+        const btn = document.getElementById('batchPredictBtn');
+        const loading = document.getElementById('batch-loading');
+        const errorEl = document.getElementById('batchError');
+        const resultEl = document.getElementById('batchResult');
+        
+        // Interactivity: Disable button and show loading spinner
+        btn.disabled = true;
+        loading.classList.remove('hidden');
+        errorEl.classList.add('hidden');
+        resultEl.classList.add('hidden');
+
+        try {
+            const data = document.getElementById('batchInput').value.trim();
+            if (!data) throw new Error("Input cannot be empty.");
+
+            let payload;
+            try {
+                // Client-side JSON validation (Reliability)
+                payload = JSON.parse(data);
+                if (!payload.applications || !Array.isArray(payload.applications)) {
+                    throw new Error('JSON structure must be {"applications": [...]}.');
+                }
+            } catch (e) {
+                throw new Error("Invalid JSON format. " + e.message);
+            }
+
+            const res = await fetch('/predict_batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const errorJson = await res.json();
+                throw new Error(errorJson.detail || res.statusText);
+            }
+
+            const json = await res.json();
+            
+            // Interpretability: Render color-coded summary
+            const summaryHtml = json.predictions.map((p, index) => {
+                const colorClass = getRiskColor(p.risk_category);
+                const proba = p.probability_of_default.toFixed(2);
+                
+                const loanAmount = p.input.loan_amnt;
+                const intent = p.input.loan_intent;
+
+                return `
+                    <div class="flex justify-between items-center p-3 border rounded-lg ${colorClass} mb-2 text-sm">
+                        <span class="font-bold">App #${index + 1}: $${loanAmount} (${intent})</span> 
+                        <span class="ml-4 font-mono font-semibold">${p.risk_category} (${proba}%)</span>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('batchSummary').innerHTML = summaryHtml;
+            resultEl.querySelector('pre').textContent = JSON.stringify(json, null, 2);
+            resultEl.classList.remove('hidden');
+            
+        } catch (err) {
+            showSectionError('batch', err.message);
+        } finally {
+            btn.disabled = false;
+            loading.classList.add('hidden');
+        }
+    }
+
+    // --- CSV PREDICTION LOGIC (Remains the same) ---
+
+    function dragOverHandler(e) { e.preventDefault(); e.currentTarget.classList.add('border-primary'); }
+    function dropHandler(e) { e.preventDefault(); e.currentTarget.classList.remove('border-primary'); handleCSV(e.dataTransfer.files[0]); }
+    function csvSelected(e) { handleCSV(e.target.files[0]); }
+    
+    function handleCSV(file) {
+      document.getElementById('csvError').classList.add('hidden');
+      document.getElementById('csvResult').classList.add('hidden');
+      
+      const dropZone = document.getElementById('dropZone');
+      
+      if (!file || !file.name.endsWith('.csv')) {
+        dropZone.innerHTML = `<p class="text-danger font-bold text-lg">⚠️ Invalid File Type (Must be .csv)</p>`;
+        document.getElementById('csvPredictBtn').disabled = true;
+        currentCSV = null;
+        return;
+      }
+      
+      dropZone.innerHTML = `<p class="text-success font-bold text-lg"><i class="fas fa-check-circle mr-2"></i> ${file.name}</p>`;
+      document.getElementById('csvPredictBtn').disabled = false;
+      window.currentCSV = file;
+    }
+    
+    async function predictCSV() {
+        const btn = document.getElementById('csvPredictBtn');
+        const loading = document.getElementById('csv-loading');
+        const errorEl = document.getElementById('csvError');
+        const resultEl = document.getElementById('csvResult');
+        
+        btn.disabled = true;
+        loading.classList.remove('hidden');
+        errorEl.classList.add('hidden');
+        resultEl.classList.add('hidden');
+
+        try {
+            if (!window.currentCSV) throw new Error("No CSV file selected.");
+            
+            const fd = new FormData(); 
+            fd.append('file', window.currentCSV);
+            
+            const res = await fetch('/predict_csv', { method: 'POST', body: fd });
+            
+            if (!res.ok) {
+                const errorText = await res.text();
+                // Reliability: Robust error parsing
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    throw new Error(errorJson.detail || res.statusText);
+                } catch {
+                    throw new Error(errorText || res.statusText);
+                }
+            }
+            
+            // The response is a blob (the CSV file content itself)
+            csvBlob = await res.blob(); 
+            resultEl.classList.remove('hidden');
+            
+        } catch (err) { 
+            showSectionError('csv', err.message);
+        } finally {
+            btn.disabled = false;
+            loading.classList.add('hidden');
+        }
+    }
+    
+    function downloadCSV() {
+      if (csvBlob) {
+        const url = URL.createObjectURL(csvBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'credit_risk_report.csv'; 
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    // Set dark mode based on system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+    }
+</script>
+</body>
+</html>

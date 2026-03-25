@@ -1,0 +1,17 @@
+{
+  "input": {
+    "person_age": 25,
+    "person_income": 65000,
+    "person_home_ownership": "RENT",
+    "person_emp_length": 5.0,
+    "loan_intent": "PERSONAL",
+    "loan_grade": "B",
+    "loan_amnt": 15000,
+    "loan_int_rate": 10.0,
+    "loan_percent_income": 0.23076923076923078,
+    "cb_person_default_on_file": "N",
+    "cb_person_cred_hist_length": 5
+  },
+  "probability_of_default": 25.0,
+  "risk_category": "MODERATE_RISK"
+}

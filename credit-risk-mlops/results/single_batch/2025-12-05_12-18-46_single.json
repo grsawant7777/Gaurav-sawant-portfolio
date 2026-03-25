@@ -1,0 +1,15 @@
+{
+  "input": {
+    "person_age": 18,
+    "person_income": 0,
+    "person_home_ownership": "string",
+    "person_emp_length": 0.0,
+    "loan_intent": "string",
+    "loan_grade": "string",
+    "loan_amnt": 100,
+    "loan_int_rate": 1.0,
+    "loan_percent_income": 1.0,
+    "cb_person_default_on_file": "string",
+    "cb_person_cred_hist_length": 0
+  },
+  "probability_of_default": 

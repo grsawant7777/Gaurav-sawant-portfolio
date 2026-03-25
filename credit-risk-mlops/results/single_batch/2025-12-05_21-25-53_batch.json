@@ -1,0 +1,175 @@
+{
+  "batch_size": 10,
+  "predictions": [
+    {
+      "input": {
+        "person_age": 22,
+        "person_income": 59000,
+        "person_home_ownership": "RENT",
+        "person_emp_length": 123.0,
+        "loan_intent": "PERSONAL",
+        "loan_grade": "D",
+        "loan_amnt": 35000,
+        "loan_int_rate": 16.02,
+        "loan_percent_income": 0.59,
+        "cb_person_default_on_file": "Y",
+        "cb_person_cred_hist_length": 3
+      },
+      "probability_of_default": 98.89,
+      "risk_category": "HIGH_RISK"
+    },
+    {
+      "input": {
+        "person_age": 21,
+        "person_income": 9600,
+        "person_home_ownership": "OWN",
+        "person_emp_length": 5.0,
+        "loan_intent": "EDUCATION",
+        "loan_grade": "B",
+        "loan_amnt": 1000,
+        "loan_int_rate": 11.14,
+        "loan_percent_income": 0.1,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 2
+      },
+      "probability_of_default": 3.28,
+      "risk_category": "LOW_RISK"
+    },
+    {
+      "input": {
+        "person_age": 25,
+        "person_income": 9600,
+        "person_home_ownership": "MORTGAGE",
+        "person_emp_length": 1.0,
+        "loan_intent": "MEDICAL",
+        "loan_grade": "C",
+        "loan_amnt": 5500,
+        "loan_int_rate": 12.87,
+        "loan_percent_income": 0.57,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 3
+      },
+      "probability_of_default": 98.16,
+      "risk_category": "HIGH_RISK"
+    },
+    {
+      "input": {
+        "person_age": 23,
+        "person_income": 65500,
+        "person_home_ownership": "RENT",
+        "person_emp_length": 4.0,
+        "loan_intent": "MEDICAL",
+        "loan_grade": "C",
+        "loan_amnt": 35000,
+        "loan_int_rate": 15.23,
+        "loan_percent_income": 0.53,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 2
+      },
+      "probability_of_default": 98.48,
+      "risk_category": "HIGH_RISK"
+    },
+    {
+      "input": {
+        "person_age": 24,
+        "person_income": 54400,
+        "person_home_ownership": "RENT",
+        "person_emp_length": 8.0,
+        "loan_intent": "MEDICAL",
+        "loan_grade": "C",
+        "loan_amnt": 35000,
+        "loan_int_rate": 14.27,
+        "loan_percent_income": 0.55,
+        "cb_person_default_on_file": "Y",
+        "cb_person_cred_hist_length": 4
+      },
+      "probability_of_default": 98.84,
+      "risk_category": "HIGH_RISK"
+    },
+    {
+      "input": {
+        "person_age": 21,
+        "person_income": 9900,
+        "person_home_ownership": "OWN",
+        "person_emp_length": 2.0,
+        "loan_intent": "VENTURE",
+        "loan_grade": "A",
+        "loan_amnt": 2500,
+        "loan_int_rate": 7.14,
+        "loan_percent_income": 0.25,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 2
+      },
+      "probability_of_default": 98.97,
+      "risk_category": "HIGH_RISK"
+    },
+    {
+      "input": {
+        "person_age": 26,
+        "person_income": 77100,
+        "person_home_ownership": "RENT",
+        "person_emp_length": 8.0,
+        "loan_intent": "EDUCATION",
+        "loan_grade": "B",
+        "loan_amnt": 35000,
+        "loan_int_rate": 12.42,
+        "loan_percent_income": 0.45,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 3
+      },
+      "probability_of_default": 98.75,
+      "risk_category": "HIGH_RISK"
+    },
+    {
+      "input": {
+        "person_age": 24,
+        "person_income": 78956,
+        "person_home_ownership": "RENT",
+        "person_emp_length": 5.0,
+        "loan_intent": "MEDICAL",
+        "loan_grade": "B",
+        "loan_amnt": 35000,
+        "loan_int_rate": 11.11,
+        "loan_percent_income": 0.44,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 4
+      },
+      "probability_of_default": 98.24,
+      "risk_category": "HIGH_RISK"
+    },
+    {
+      "input": {
+        "person_age": 24,
+        "person_income": 83000,
+        "person_home_ownership": "RENT",
+        "person_emp_length": 8.0,
+        "loan_intent": "PERSONAL",
+        "loan_grade": "A",
+        "loan_amnt": 35000,
+        "loan_int_rate": 8.9,
+        "loan_percent_income": 0.42,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 2
+      },
+      "probability_of_default": 98.05,
+      "risk_category": "HIGH_RISK"
+    },
+    {
+      "input": {
+        "person_age": 21,
+        "person_income": 10000,
+        "person_home_ownership": "OWN",
+        "person_emp_length": 6.0,
+        "loan_intent": "VENTURE",
+        "loan_grade": "D",
+        "loan_amnt": 1600,
+        "loan_int_rate": 14.74,
+        "loan_percent_income": 0.16,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 3
+      },
+      "probability_of_default": 94.39,
+      "risk_category": "HIGH_RISK"
+    }
+  ]
+}

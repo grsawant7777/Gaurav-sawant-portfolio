@@ -1,0 +1,22 @@
+{
+  "batch_size": 1,
+  "predictions": [
+    {
+      "input": {
+        "person_age": 26,
+        "person_income": 85000,
+        "person_home_ownership": "RENT",
+        "person_emp_length": 3.0,
+        "loan_intent": "EDUCATION",
+        "loan_grade": "A",
+        "loan_amnt": 40000,
+        "loan_int_rate": 7.2,
+        "loan_percent_income": 0.47,
+        "cb_person_default_on_file": "N",
+        "cb_person_cred_hist_length": 5
+      },
+      "probability_of_default": 99.24,
+      "risk_category": "HIGH_RISK"
+    }
+  ]
+}
