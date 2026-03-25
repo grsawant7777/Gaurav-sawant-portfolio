@@ -1,0 +1,35 @@
+# dbt/dbt_project.yml
+name: 'ecommerce_dw'
+version: '1.0.0'
+config-version: 2
+profile: 'ecommerce_dw'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+test-paths: ["tests"]
+analysis-paths: ["analysis"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  ecommerce_dw:
+    # Config applied to all models
+    +materialized: view 
+
+    staging:
+      # Staging models often use 'view' or 'ephemeral'
+      +schema: raw_staging 
+
+    core:
+      # Core models (Dimensions and Facts)
+      +schema: analytics_mart
+
+    marts:
+      # Marts (Reports) often use 'table' for downstream consumption
+      +schema: analytics_mart
+      +materialized: table

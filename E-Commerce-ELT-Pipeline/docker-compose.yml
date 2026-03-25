@@ -1,0 +1,102 @@
+version: '3.8'
+
+# Shared configurations to avoid repetition
+x-airflow-common: &airflow-common
+  build:
+    context: .
+    dockerfile: Dockerfile.airflow
+  environment:
+    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=${AIRFLOW_METADATA_URL}
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - AIRFLOW__CORE__FERNET_KEY=${FERNET_KEY}
+    - AIRFLOW_CONN_POSTGRES_DEFAULT=${AIRFLOW_WAREHOUSE_URL}
+    - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    - AIRFLOW__WEBSERVER__SECRET_KEY=${SECRET_KEY}
+    - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./dbt:/opt/airflow/dbt
+    - ./sql:/opt/airflow/sql
+    - ./source_data:/opt/airflow/source_data
+  user: "${AIRFLOW_UID}"
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:13-alpine
+    container_name: postgres_warehouse
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_METADATA}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    command: >
+      sh -c "docker-entrypoint.sh postgres &
+      sleep 5;
+      psql -U ${POSTGRES_USER} -d ${POSTGRES_DB_METADATA} -c 'CREATE DATABASE ${POSTGRES_DB_WAREHOUSE};' || true;
+      wait"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB_METADATA}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow_init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db upgrade &&
+        airflow users create \
+          --username airflow \
+          --firstname Gaurav \
+          --lastname Sawant \
+          --role Admin \
+          --email admin@example.com \
+          --password airflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow_webserver
+    command: webserver
+    ports:
+      - "8080:8080"
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow_scheduler
+    command: scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./metabase_data:/metabase-data
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  airflow-config:

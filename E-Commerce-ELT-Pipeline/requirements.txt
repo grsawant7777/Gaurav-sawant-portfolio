@@ -1,0 +1,4 @@
+# Host machine dependencies for generating synthetic data
+pandas
+Faker
+psycopg2-binary # Optional: If you ever need to manually connect to Postgres from the host

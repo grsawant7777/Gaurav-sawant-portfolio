@@ -1,0 +1,25 @@
+FROM apache/airflow:2.7.2-python3.10
+
+USER root
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    build-essential \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Pre-create folders to ensure correct permissions
+RUN mkdir -p /opt/airflow/dbt /opt/airflow/sql /opt/airflow/source_data && \
+    chown -R airflow: /opt/airflow/dbt /opt/airflow/sql /opt/airflow/source_data
+
+USER airflow
+
+# Install Python requirements
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    dbt-core==1.7.5 \
+    dbt-postgres==1.7.5 \
+    pandas \
+    psycopg2-binary \
+    sqlalchemy

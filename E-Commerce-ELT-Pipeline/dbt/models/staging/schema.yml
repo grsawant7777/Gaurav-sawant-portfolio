@@ -1,0 +1,47 @@
+version: 2
+
+sources:
+  - name: ecom_raw
+    database: ecommerce_data
+    schema: raw_staging
+    tables:
+      - name: customers
+      - name: orders
+      - name: products
+
+models:
+  - name: stg_customers
+    description: "Cleaned customer data with standardized IDs."
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_products
+    description: "Cleaned product catalog data."
+    columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_orders
+    description: "Transactional order data linked to customers and products."
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customer_id
+      - name: product_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_products')
+              field: product_id

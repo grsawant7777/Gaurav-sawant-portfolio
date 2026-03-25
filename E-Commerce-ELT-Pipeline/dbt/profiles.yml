@@ -1,0 +1,13 @@
+# dbt/profiles.yml
+ecommerce_dw:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      threads: 4
+      host: postgres # Service name from docker-compose
+      port: 5432
+      user: airflow
+      pass: airflow
+      dbname: ecommerce_data
+      schema: public # Default dbt schema

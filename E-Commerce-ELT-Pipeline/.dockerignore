@@ -1,0 +1,15 @@
+# Git
+.git
+.gitignore
+.dockerignore
+# Python virtual environment
+.venv/
+venv/
+
+dbt/dbt_packages
+dbt/target
+dbt/logs
+
+# Local Data/Logs (Already handled by volumes)
+metabase_data/
+.env
